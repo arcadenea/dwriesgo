@@ -1,0 +1,138 @@
+Proyecto DW
+===========
+
+
+Análisis preliminar:
+===================
+El objetivo del siguiente proyecto es generar un set completo de tableros extendibles que permitan ser instalados como un paquete prearmado en una entidad bancaria. Los mismos deben adaptarse a las diversas características de los cores bancarios, los cuales pueden contener diversas características disímiles como ser:
+
+- Performance
+- Identificación del cliente
+- Base de datos del core
+
+
+Tableros:
+=========
+- Posición Integral de Mora
+- Posición Integral de Préstamos
+- Posición Integral de Tarjetas de Crédito
+- Posición Integral de Plazos Fijos
+- Probabilidad de Default
+- Matriz de Transición
+- Cartera Deteriorada
+- Cartera Irregular
+- Concentración en Depósitos
+- Deuda por Productos
+- Deuda por Subsistemas
+- Deuda por Situación BCRA
+- Deuda por Segmentos de Atraso
+
+
+
+Alcance de productos:
+=====================
+- Préstamos
+- Tarjetas de Crédito
+- Plazos Fijos
+- Cajas de Ahorro
+- Cuentas Corrientes
+
+
+Metodología de Operación
+========================
+El producto debe estar compuesto de los siguientes elementos:
+- Tableros
+- Base de Datos
+- Procedimientos almacenados
+
+Al instalar el mismo, se entrega el producto (TDA) con los mencionados tableros, una base de datos que puede contener datos de prueba y los respectivos procedimientos almacenados, los cuales deben correrse en un proceso diario para preprocesar los datos.
+
+La alimentación de la tabla de saldos debe ser hecha por la entidad, siendo ellos quienes validen esa información. Si se requiere de un trabajo adicional para esta carga de datos o un ajuste especial del producto, debería ser facturado como un adicional.
+
+La ventana de tiempo en que se almacenen los datos debe ser elegida por la entidad, con la posibilidad de ser configurada en los scripts que se entregan. Esto dependerá de las necesidades de información. En general se puede recomendar almacenar la información diaria durante 3 meses y luego almacenar solamente el cierre de cada mes.
+
+La apertura de los productos dependerá de las necesidades de cada entidad. Por ejemplo se puede tomar como producto "Tarjetas de Crédito" o "Tarjeta de Crédito - VISA". Es necesario considerar esta posibilidad al armar el esquema de tablas.
+
+Tablas necesarias:
+==================
+- Saldos por cliente
+- Saldos por cliente y producto
+- Totales precalculados
+
+
+
+Totales Precalculados:
+======================
+- Fecha de información
+- Sucursal
+- Cartera (Comercial o Consumo)
+- Producto (TC, PR, CC, etc)
+- Moneda
+- Capital
+- Intereses
+- Segmento de atraso (30, 90, 180 o mas de 365 días)
+- Fecha de Proceso
+- Usuario de Proceso
+
+
+Saldos por Cliente:
+====================
+- Fecha de información
+- Sucursal
+- Tipo identificación cliente
+- Nro. identificación cliente
+- Moneda
+- Capital
+- Intereses
+- Máximo atraso deuda (de todos los productos del cliente)
+- Fecha de Proceso
+- Usuario de Proceso
+
+
+
+Saldos por Cliente y Producto:
+==============================
+- Fecha de información
+- Sucursal
+- Tipo identificación cliente
+- Nro. identificación cliente
+- Producto (TC, PR, CC, etc)
+- Moneda
+- Capital
+- Intereses
+- Atraso deuda
+- Fecha de alta de producto
+- Fecha de último pago
+- Total de cuotas
+- Cantidad de cuotas impagas
+- Duración (PF)
+- Fecha de Proceso
+- Usuario de Proceso
+
+Cliente
+=======
+- Tipo identificación cliente
+- Nro. identificación cliente
+- Clasificación BCRA
+- Razón Social
+- Teléfono
+- Dirección
+- Cartera (Comercial o Consumo)
+- Fecha de Proceso
+- Usuario de Proceso
+
+Producto
+========
+- id producto
+- Nombre producto
+- Abreviatura producto
+- Subsistema producto
+- Origen info (core, app externa)
+- Fecha de Proceso
+- Usuario de Proceso
+
+Fechas Proceso
+==============
+- Fecha proceso
+- Usuario de Proceso
+- Estado (OK, en proceso, error, etc)

@@ -1,0 +1,40 @@
+Filtro Sucursales
+=================
+select id_sucursal, descripcion
+from sucursales
+
+
+Filtro Clasificaciones BCRA
+===========================
+select id_clasificacion_bcra, descripcion
+from clasificacion_bcra
+
+
+Filtro Fechas de Proceso
+========================
+select fecha_proceso, fecha_proceso
+from fechas_proceso
+
+
+Filtro Productos
+================
+select id_producto, descripcion
+from productos
+
+
+Filtro Segmentos de Atraso
+==========================
+select id_segmento_atraso, descripcion
+from segmentos_atraso
+
+
+Filtro Carteras
+==========================
+select id_cartera, descripcion
+from carteras
+
+
+Filtro monedas
+==============
+select id_moneda, descripcion
+from monedas

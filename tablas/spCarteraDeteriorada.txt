@@ -1,0 +1,83 @@
+declare @fecha_inicio date = '2018-01-01'
+declare @fecha_fin date = '2018-01-01';
+
+
+WITH SITUACION_INICIO AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.descripcion as sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = @fecha_inicio
+and b.id_clasificacion_bcra >=3
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.descripcion,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),
+
+SITUACION_FIN AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.descripcion as sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = @fecha_fin
+and b.id_clasificacion_bcra < 3
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.descripcion,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),			
+
+
+select i.fecha_informacion as fecha, 100.0*sum(case when f.tipo_id_cliente is not null then 1 else 0 end)/count(1) as porcentaje
+from SITUACION_INICIO i
+inner join SITUACION_FIN f
+on i.tipo_id_cliente = f.tipo_id_cliente and i.nro_id_cliente = f.nro_id_cliente
+group by i.fecha_informacion
+

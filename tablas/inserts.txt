@@ -1,0 +1,58 @@
+INSERT INTO clasificacion_bcra(id_clasificacion_bcra, descripcion, fecha_proceso, usuario_proceso)
+values(1, 'Situación 1', GETDATE(), ''),
+(2, 'Situación 2', GETDATE(), ''),
+(3, 'Situación 3', GETDATE(), ''),
+(4, 'Situación 4', GETDATE(), ''),
+(5, 'Situación 5', GETDATE(), ''),
+(6, 'Situación 6', GETDATE(), '');
+
+
+INSERT INTO carteras (id_cartera, descripcion, fecha_proceso, usuario_proceso)
+values(1, 'Cartera Consumo', GETDATE(), ''),
+      (2, 'Cartera Comercial', GETDATE(), '')
+
+
+INSERT INTO segmentos_atraso (id_segmento_atraso, descripcion, atraso_minimo, atraso_maximo, fecha_proceso, usuario_proceso)
+values(1, 'Atraso hasta 15 días', 0, 15, GETDATE(), ''),
+      (3, 'Atraso entre 16 y 30 días', 16, 30, GETDATE(), ''),
+      (4, 'Atraso entre 31 y 60 días', 31, 60, GETDATE(), ''),
+      (5, 'Atraso entre 61 y 90 días', 61, 90, GETDATE(), ''),
+      (6, 'Atraso entre 91 y 180 días', 91, 180, GETDATE(), ''),
+      (7, 'Atraso entre 181 y 365 días', 181, 365, GETDATE(), ''),
+      (8, 'Atraso de mas de 365 días', 366, 9999999, GETDATE(), '') 
+
+
+INSERT INTO productos (id_producto, nombre_producto, abreviatura_producto, subsistema, origen, fecha_proceso, usuario_proceso)
+values(1, 'Tarjeta de Crédito 1', 'TC1', 1, 1, GETDATE(), ''),
+(2, 'Tarjeta de Crédito 2', 'TC2', 1, 1, GETDATE(), ''),
+(3, 'Préstamos Personales', 'PP', 1, 1, GETDATE(), ''),
+(4, 'Préstamos Comerciales', 'PR', 1, 1, GETDATE(), ''),
+(5, 'Cuentas Corrientes', 'CC', 1, 1, GETDATE(), '');
+
+
+INSERT INTO id_clientes (tipo_id_cliente, descripcion, abreviatura, correspondencia_core, fecha_proceso, usuario_proceso)
+values(1, 'Documento Nacional de Identidad', 'DNI', 96, GETDATE(), ''),
+(2, 'Libreta Cívica', 'LC', 90, GETDATE(), ''),
+(3, 'CUIT', 'CUIT', 80, GETDATE(), ''),
+(4, 'Otro', 'OTRO', 99, GETDATE(), '');
+
+
+INSERT INTO sucursales (id_sucursal, nombre_sucursal, abreviatura_sucursal, fecha_proceso, usuario_proceso)
+values(1, 'Capital Federal', 'CABA', GETDATE(), ''),
+(2, 'Rosario', 'ROS', GETDATE(), ''),
+(3, 'Resistencia', 'RES', GETDATE(), ''),
+(4, 'Corrientes', 'CTES', GETDATE(), '');
+
+
+INSERT INTO monedas (id_moneda, nombre_moneda, abreviatura, fecha_proceso, usuario_proceso)
+values(1, 'Pesos Argentinos', 'ARS', GETDATE(), ''),
+(2, 'Dólares Estadounidenses', 'USD', GETDATE(), ''),
+(3, 'Reales', 'BRL', GETDATE(), ''),
+(4, 'Euros', 'EUR', GETDATE(), '');
+
+
+
+
+
+
+

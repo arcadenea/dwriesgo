@@ -1,0 +1,174 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- ======================================================
+-- Author:		Gabriel Ernesto Cabral
+-- Description:	Carga datos en la tabla matriz_transicion
+-- ======================================================
+CREATE PROCEDURE spCargarMatrizTransicion 
+	-- Add the parameters for the stored procedure here
+	@fecha_inicio date = '1999-01-01',
+	@fecha_fin date = '1999-01-01'
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+
+--declare @fecha_inicio date = '2018-01-01'
+--declare @fecha_fin date = '2018-01-31';
+	
+WITH SITUACION_INICIO AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.descripcion as sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = @fecha_inicio
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.descripcion,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),
+
+SITUACION_FIN AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.descripcion as sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = @fecha_fin
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.descripcion,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),			
+
+RESULTADOS AS(
+select i.id_clasificacion_bcra as situacion_inicio, f.id_clasificacion_bcra as situacion_fin, COUNT(1) as cantidad
+from SITUACION_INICIO i
+inner join SITUACION_FIN f
+on i.tipo_id_cliente = f.tipo_id_cliente and i.nro_id_cliente = f.nro_id_cliente
+group by i.id_clasificacion_bcra, f.id_clasificacion_bcra
+)
+
+insert into matriz_transicion 
+select	9999 as id_sucursal, 
+		descripcion,
+		sit1,
+		sit2,
+		sit3,
+		sit4,
+		sit5,
+		@fecha_inicio as fecha_inicio,
+		@fecha_fin as fecha_fin,
+		GETDATE() as fecha_proceso,
+		'' as usuario_proceso		  
+from(
+	select	cast(GETDATE() as date) as fecha_informacion,
+			'Situación 1' as descripcion,
+			coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as sit1,
+			coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as sit2,
+			coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as sit3,
+			coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as sit4,
+			coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as sit5
+	from resultados
+	where situacion_inicio = 1
+
+	union all
+	 
+	select	cast(GETDATE() as date) as fecha_informacion,
+			'Situación 2' as descripcion,
+			coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as sit1,
+			coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as sit2,
+			coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as sit3,
+			coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as sit4,
+			coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as sit5
+	from resultados
+	where situacion_inicio = 2
+
+	union all
+
+	select	cast(GETDATE() as date) as fecha_informacion,
+			'Situación 3' as descripcion,
+			coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as sit1,
+			coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as sit2,
+			coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as sit3,
+			coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as sit4,
+			coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as sit5
+	from resultados
+	where situacion_inicio = 3
+
+	union all
+
+	select	cast(GETDATE() as date) as fecha_informacion,
+			'Situación 4' as descripcion,
+			coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as sit1,
+			coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as sit2,
+			coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as sit3,
+			coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as sit4,
+			coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as sit5
+	from resultados
+	where situacion_inicio = 4
+
+	union all
+
+	select	cast(GETDATE() as date) as fecha_informacion,
+			'Situación 5' as descripcion,
+			coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as sit1,
+			coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as sit2,
+			coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as sit3,
+			coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as sit4,
+			coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as sit5
+	from resultados
+	where situacion_inicio = 5
+) as x
+
+END
+GO
+

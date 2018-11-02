@@ -1,0 +1,28 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+--=================================================================
+-- Author:		Gabriel Ernesto Cabral
+-- Description:	Vuelca datos de las tablas diarias a las históricas
+-- ================================================================
+
+
+CREATE PROCEDURE spPaseHistorico
+
+AS
+BEGIN
+
+use DWriesgo
+
+insert into clientes_hist
+select * from clientes 
+
+insert into saldos_hist
+select * from saldos
+
+truncate table clientes
+truncate table saldos
+
+END
+GO

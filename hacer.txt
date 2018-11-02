@@ -1,0 +1,2 @@
+- unificar nombres de columnas (id_columna, descripcion_columna)
+- agregar columna de descripcion y geolocalización a sucursales

@@ -1,0 +1,232 @@
+
+
+--DEUDA POR PRODUCTOS
+select	s.fecha_informacion,
+		su.id_sucursal,
+		su.nombre_sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		p.id_producto, 
+		nombre_producto, 
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join productos p
+on s.id_producto = p.id_producto
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+group by	s.fecha_informacion,
+			su.id_sucursal,
+			su.nombre_sucursal,
+			p.id_producto, 
+			p.nombre_producto,
+			m.nombre_moneda,
+			m.abreviatura
+
+
+
+--DEUDA POR SEGMENTOS BCRA
+select	s.fecha_informacion,
+		su.id_sucursal,
+		su.nombre_sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+group by	s.fecha_informacion,
+			su.id_sucursal,
+			su.nombre_sucursal,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura	
+
+
+--DEUDA POR SEGMENTOS DE ATRASO
+
+select	s.fecha_informacion,
+		su.id_sucursal,
+		su.nombre_sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		a.id_segmento_atraso,
+		a.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join segmentos_atraso a
+on s.dias_atraso between a.atraso_minimo and a.atraso_maximo 
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+group by	s.fecha_informacion,
+			su.id_sucursal,
+			su.nombre_sucursal,
+			a.id_segmento_atraso,
+			a.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+
+
+--CARTERA DETERIORADA
+
+
+--MATRIZ DE TRANSICION
+WITH SITUACION_INICIO AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.nombre_sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = '2018-01-09'
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.nombre_sucursal,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),
+
+SITUACION_FIN AS(
+select	s.fecha_informacion,
+		s.tipo_id_cliente,
+		s.nro_id_cliente,
+		su.id_sucursal,
+		su.nombre_sucursal,
+		m.nombre_moneda,
+		m.abreviatura, 
+		b.id_clasificacion_bcra,
+		b.descripcion,
+		SUM(capital_moneda_homogenea) as deuda_capital,
+		SUM(intereses_moneda_homogenea) as deuda_intereses
+from saldos s
+inner join clientes c
+on s.tipo_id_cliente = c.tipo_id_cliente and s.nro_id_cliente = c.nro_id_cliente 
+inner join productos p
+on s.id_producto = p.id_producto
+inner join clasificacion_bcra b
+on c.id_clasificacion_bcra = b.id_clasificacion_bcra
+inner join sucursales su
+on su.id_sucursal = s.id_sucursal
+inner join monedas m
+on m.id_moneda = s.id_moneda
+where s.fecha_informacion = '2018-02-09'
+group by	s.fecha_informacion,
+			s.tipo_id_cliente,
+			s.nro_id_cliente,
+			su.id_sucursal,
+			su.nombre_sucursal,
+			b.id_clasificacion_bcra,
+			b.descripcion,
+			m.nombre_moneda,
+			m.abreviatura
+),			
+
+RESULTADOS AS(
+select i.id_clasificacion_bcra as situacion_inicio, f.id_clasificacion_bcra as situacion_fin, COUNT(1) as cantidad
+from SITUACION_INICIO i
+inner join SITUACION_FIN f
+on i.tipo_id_cliente = f.tipo_id_cliente and i.nro_id_cliente = f.nro_id_cliente
+group by i.id_clasificacion_bcra, f.id_clasificacion_bcra
+)
+
+select	cast(GETDATE() as date) as fecha_informacion,
+		'Situación 1' as descripcion,
+		coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 1',
+		coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 2',
+		coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 3',
+		coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 4',
+		coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 5'
+from resultados
+where situacion_inicio = 1
+
+union all
+
+select	cast(GETDATE() as date) as fecha_informacion,
+		'Situación 2' as descripcion,
+		coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 1',
+		coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 2',
+		coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 3',
+		coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 4',
+		coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 5'
+from resultados
+where situacion_inicio = 2
+
+union all
+
+select	cast(GETDATE() as date) as fecha_informacion,
+		'Situación 3' as descripcion,
+		coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 1',
+		coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 2',
+		coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 3',
+		coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 4',
+		coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 5'
+from resultados
+where situacion_inicio = 3
+
+union all
+
+select	cast(GETDATE() as date) as fecha_informacion,
+		'Situación 4' as descripcion,
+		coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 1',
+		coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 2',
+		coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 3',
+		coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 4',
+		coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 5'
+from resultados
+where situacion_inicio = 4
+
+union all
+
+select	cast(GETDATE() as date) as fecha_informacion,
+		'Situación 5' as descripcion,
+		coalesce(sum(case when situacion_fin = 1 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 1',
+		coalesce(sum(case when situacion_fin = 2 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 2',
+		coalesce(sum(case when situacion_fin = 3 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 3',
+		coalesce(sum(case when situacion_fin = 4 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 4',
+		coalesce(sum(case when situacion_fin = 5 then cantidad else 0 end)/SUM(cantidad), 0) as 'Situación 5'
+from resultados
+where situacion_inicio = 5
+
+
+
