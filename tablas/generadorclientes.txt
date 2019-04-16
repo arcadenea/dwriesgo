@@ -1,4 +1,6 @@
 DECLARE @id INT;
+DECLARE @bcra INT;
+DECLARE @cartera INT;
 DECLARE @tdoc INT;
 DECLARE @ndoc INT;
 DECLARE @cuit varchar(11);
@@ -19,11 +21,13 @@ BEGIN
 
 --INSERTAMOS UN NUEVO CLIENTE
 	SET @tdoc = ROUND((3 * RAND() + 1), 0)
+	SET @bcra = ROUND((3 * RAND() + 1), 0)
+	SET @cartera = ROUND((1 * RAND() + 1), 0)	
 	SET @ndoc = ROUND((38999999 * RAND() + 1000000), 0)
 	SET @cuit = '20'+ right('00000000'+cast(@ndoc as varchar(8)), 8)+'1'
 
 	INSERT INTO clientes (tipo_id_cliente, nro_id_cliente, cuit_cliente, id_clasificacion_bcra, razon_social, id_cartera, fecha_proceso, usuario_proceso)
-	values( @tdoc, @ndoc, @cuit, 1, 'Usuario Prueba '+ CAST(@id as varchar(1000)), 1, GETDATE(), 'AUTOGENERADO')
+	values( @tdoc, @ndoc, @cuit, @bcra, 'Usuario Prueba '+ CAST(@id as varchar(1000)), @cartera, GETDATE(), 'AUTOGENERADO')
 
 
 --INSERTAMOS PRODUCTOS PARA EL CLIENTE
@@ -32,7 +36,7 @@ BEGIN
 	WHILE @contprod < @cantprod
 	BEGIN
 		INSERT INTO saldos (fecha_informacion, id_sucursal, tipo_id_cliente, nro_id_cliente, id_producto, id_moneda, capital_moneda_original, intereses_moneda_original, capital_moneda_local, intereses_moneda_local, dias_atraso, fecha_ultimo_pago, cantidad_cuotas, cuotas_impagas, duracion, fecha_proceso, usuario_proceso)
-		values('2018-02-09', 4, @tdoc, @ndoc, 1, 1, 3000, 200, 3000, 200, 10, '2017-01-01', 0, 0, 0, GETDATE(), '')
+		values('2018-02-09', 4, @tdoc, @ndoc, @contprod, 1, 3000, 200, 3000, 200, 10, '2017-01-01', 0, 0, 0, GETDATE(), '')
 		
 		SET @contprod = @contprod + 1
 	END
@@ -45,6 +49,10 @@ END
 select * from clientes 
 
 select * from saldos
+
+
+truncate table clientes
+truncate table saldos
 
 
 

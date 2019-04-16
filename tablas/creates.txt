@@ -114,7 +114,7 @@ usuario_proceso			varchar(255)
 
 CREATE TABLE monedas (
 id_moneda				int,
-nombre_moneda			varchar(255),
+descripcion 			varchar(255),
 abreviatura				varchar(3),
 fecha_proceso			datetime,
 usuario_proceso			varchar(255)

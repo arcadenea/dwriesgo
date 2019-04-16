@@ -1,3 +1,6 @@
+use dwriesgo
+
+
 INSERT INTO clasificacion_bcra(id_clasificacion_bcra, descripcion, fecha_proceso, usuario_proceso)
 values(1, 'Situación 1', GETDATE(), ''),
 (2, 'Situación 2', GETDATE(), ''),
@@ -22,7 +25,7 @@ values(1, 'Atraso hasta 15 días', 0, 15, GETDATE(), ''),
       (8, 'Atraso de mas de 365 días', 366, 9999999, GETDATE(), '') 
 
 
-INSERT INTO productos (id_producto, nombre_producto, abreviatura_producto, subsistema, origen, fecha_proceso, usuario_proceso)
+INSERT INTO productos (id_producto, descripcion, abreviatura, subsistema, origen, fecha_proceso, usuario_proceso)
 values(1, 'Tarjeta de Crédito 1', 'TC1', 1, 1, GETDATE(), ''),
 (2, 'Tarjeta de Crédito 2', 'TC2', 1, 1, GETDATE(), ''),
 (3, 'Préstamos Personales', 'PP', 1, 1, GETDATE(), ''),
@@ -37,18 +40,39 @@ values(1, 'Documento Nacional de Identidad', 'DNI', 96, GETDATE(), ''),
 (4, 'Otro', 'OTRO', 99, GETDATE(), '');
 
 
-INSERT INTO sucursales (id_sucursal, nombre_sucursal, abreviatura_sucursal, fecha_proceso, usuario_proceso)
+INSERT INTO sucursales (id_sucursal, descripcion, abreviatura, fecha_proceso, usuario_proceso)
 values(1, 'Capital Federal', 'CABA', GETDATE(), ''),
 (2, 'Rosario', 'ROS', GETDATE(), ''),
 (3, 'Resistencia', 'RES', GETDATE(), ''),
 (4, 'Corrientes', 'CTES', GETDATE(), '');
 
 
-INSERT INTO monedas (id_moneda, nombre_moneda, abreviatura, fecha_proceso, usuario_proceso)
+INSERT INTO monedas (id_moneda, descripcion, abreviatura, fecha_proceso, usuario_proceso)
 values(1, 'Pesos Argentinos', 'ARS', GETDATE(), ''),
 (2, 'Dólares Estadounidenses', 'USD', GETDATE(), ''),
 (3, 'Reales', 'BRL', GETDATE(), ''),
 (4, 'Euros', 'EUR', GETDATE(), '');
+
+
+INSERT INTO probabilidad_default (id_sucursal, descripcion, porcentaje, fecha_proceso, usuario_proceso)
+values(1, 'Probabilidad de Default', 25, GETDATE(), ''),
+(2, 'Probabilidad de Default', 5, GETDATE(), ''),
+(3, 'Probabilidad de Default', 10, GETDATE(), ''),
+(9999, 'Probabilidad de Default', 20, GETDATE(), '');
+
+INSERT INTO cartera_deteriorada (id_sucursal, descripcion, porcentaje, fecha_proceso, usuario_proceso)
+values(1, 'Cartera Deteriorada', 25, GETDATE(), ''),
+(2, 'Cartera Deteriorada', 5, GETDATE(), ''),
+(3, 'Cartera Deteriorada', 10, GETDATE(), ''),
+(9999, 'Cartera Deteriorada', 20, GETDATE(), '');
+
+INSERT INTO cartera_irregular (id_sucursal, descripcion, porcentaje, fecha_proceso, usuario_proceso)
+values(1, 'Cartera Irregular', 25, GETDATE(), ''),
+(2, 'Cartera Irregular', 5, GETDATE(), ''),
+(3, 'Cartera Irregular', 10, GETDATE(), ''),
+(9999, 'Cartera Irregular', 20, GETDATE(), '');
+
+
 
 
 
